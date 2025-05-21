@@ -6,6 +6,7 @@ import "./training/.ipynb_checkpoints/trainingOnepy";
 import "./training/.ipynb_checkpoints/trainingTwopy";
 import { toast } from 'react-toastify';
 import { validKeywords } from './componnets/Toast';
+import Loading from './componnets/Loading';
 function App() {
   const fileRef = useRef();
   const [image, setImage] = useState(null);
@@ -103,7 +104,7 @@ function App() {
           {loading ? 'Detecting...' : 'Detect Disease'}
         </button>
 
-        {loading && <div className="spinner"></div>}
+        {loading && <Loading/>}
 
         {result && (
           <div className="result">
