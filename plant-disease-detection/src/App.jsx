@@ -2,14 +2,16 @@ import './App.css';
 import { useRef, useState } from 'react';
 import { outputs } from './data/data';
 import SparkMD5 from 'spark-md5';
-import "./training/.ipynb_checkpoints/trainingOnepy"
-import "./training/.ipynb_checkpoints/trainingTwopy"
+import "./training/.ipynb_checkpoints/trainingOnepy";
+import "./training/.ipynb_checkpoints/trainingTwopy";
+import { toast } from 'react-toastify';
+import { validKeywords } from './componnets/Toast';
 function App() {
   const fileRef = useRef();
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
-  const imageResultMap = useRef(new Map()); 
+  const imageResultMap = useRef(new Map());
 
   const handleClearInput = () => {
     setImage(null);
@@ -30,11 +32,16 @@ function App() {
     });
   };
 
+  const isLikelyLeafImage = (file) => {
+    const lowerName = file.name.toLowerCase();
+    // const validKeywords = ['leaf', 'plant', 'leaves',"early","lb"];
+    return validKeywords.some(keyword => lowerName.includes(keyword));
+  };
+
   const handleImageChange = async (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const hash = await generateImageHash(file);
-
       const imageUrl = URL.createObjectURL(file);
       setImage({ url: imageUrl, file, hash });
       setResult(null);
@@ -42,12 +49,22 @@ function App() {
   };
 
   const handleDetect = () => {
+   
     setLoading(true);
     setResult(null);
 
     const hash = image.hash;
 
     setTimeout(() => {
+       if (!image) return;
+
+    if (!isLikelyLeafImage(image.file)) {
+      toast.error("Invalid image! Please upload a leaf image.");
+      handleClearInput();
+      setLoading(false);
+      return;
+    }
+
       let storedResult = imageResultMap.current.get(hash);
 
       if (!storedResult) {
@@ -68,7 +85,7 @@ function App() {
         <label className="label">
           Upload Leaf Image
           <input
-            className='input'
+            className="input"
             ref={fileRef}
             type="file"
             accept="image/*"
@@ -79,7 +96,7 @@ function App() {
         {image && <img src={image.url} alt="Plant Preview" className="image" />}
 
         <button
-          title={loading ? "" : "provide image"}
+          title={loading ? "" : "Provide image"}
           className="btn"
           onClick={handleDetect}
           disabled={!image || loading}
