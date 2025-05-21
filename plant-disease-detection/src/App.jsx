@@ -34,7 +34,6 @@ function App() {
 
   const isLikelyLeafImage = (file) => {
     const lowerName = file.name.toLowerCase();
-    // const validKeywords = ['leaf', 'plant', 'leaves',"early","lb"];
     return validKeywords.some(keyword => lowerName.includes(keyword));
   };
 
